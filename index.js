@@ -49,6 +49,13 @@ app.post('/marathons',async(req,res)=>{
 
 })
 
+// marathon get
+app.get('/marathons',async(req,res)=>{
+    const cursor=marathonsCollection.find();
+    const result=await cursor.toArray();
+    res.send(result);
+})
+
 
 
 
