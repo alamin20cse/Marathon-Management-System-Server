@@ -18,7 +18,6 @@ app.use(express.json());
 
 
 
-
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.uslpn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -35,11 +34,32 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
+
+    const marathonsCollection=client.db('marathonsDB').collection('marathons');
+
+
+// marathon post
+app.post('/marathons',async(req,res)=>{
+    const marathons=req.body;
+    console.log(marathons);
+
+    const result=await marathonsCollection.insertOne(marathons);
+    res.send(result);
+
+})
+
+
+
+
+
+
+
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
