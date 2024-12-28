@@ -47,6 +47,20 @@ async function run() {
       res.send(result);
     });
 
+
+    // Backend API for marathon registration details
+app.get('/RegistrationMarathon/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const marathon = await marathonsCollection.findOne(query);
+    res.send(marathon);
+  });
+  
+  
+
+
+
+
     console.log("Connected to MongoDB successfully!");
   } finally {
     // Optionally close the client after operations
