@@ -66,6 +66,13 @@ app.get('/RegistrationMarathon/:id', async (req, res) => {
 // });
 
 
+// for delete operation
+app.delete('/marathons/:id',async(req,res)=>{
+  const id=req.params.id;
+  const query={_id:new ObjectId(id)};
+  const result=await marathonsCollection.deleteOne(query);
+  res.send(result);
+})
 
 
   
