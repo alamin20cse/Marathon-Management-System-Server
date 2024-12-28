@@ -55,6 +55,19 @@ app.get('/RegistrationMarathon/:id', async (req, res) => {
     const marathon = await marathonsCollection.findOne(query);
     res.send(marathon);
   });
+
+
+   // Get all specific user  marathons
+//    app.get('/marathons/:email', async (req, res) => {
+//     const Email = req.params.email;
+//     const query = { email: Email };
+//     const result = await marathonsCollection.find(query).toArray();
+//     res.send(result);
+// });
+
+
+
+
   
   
 
