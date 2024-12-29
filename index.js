@@ -24,6 +24,7 @@ async function run() {
   try {
     await client.connect();
     const marathonsCollection = client.db('marathonsDB').collection('marathons');
+    const marathonsRegCollection = client.db('marathonsDB').collection('marathonReg');
 
     // Create a new marathon
     app.post('/marathons', async (req, res) => {
@@ -114,6 +115,23 @@ app.delete('/marathons/:id',async(req,res)=>{
 })
 
 
+
+
+// for registeion of marathon part
+
+ // Create a new marathon
+ app.post('/marathonsreg', async (req, res) => {
+  const marathonReg = req.body;
+  const result = await marathonsRegCollection.insertOne(marathonReg);
+  res.send(result);
+});
+
+// Get all marathons
+app.get('/marathonsreg', async (req, res) => {
+  const cursor = marathonsRegCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+});
   
   
 
