@@ -115,18 +115,30 @@ app.delete('/marathons/:id',async(req,res)=>{
 })
 
 
+// ============
 
+// for registeion of marathon part===============
 
-// for registeion of marathon part
-
- // Create a new marathon
+ // Create a new marathon regestion 
+//  1.save data in registion
  app.post('/marathonsreg', async (req, res) => {
   const marathonReg = req.body;
   const result = await marathonsRegCollection.insertOne(marathonReg);
+  // 2. increase reg count in marathon
+  const filter ={_id:new ObjectId(marathonReg.marathonID)}
+  const  update={
+    $inc:{totalRegistrationCount: 1},
+
+  }
+  const updateRegCount=await marathonsCollection.updateOne(filter,update)
+  console.log(updateRegCount)
+
+
+
   res.send(result);
 });
 
-// Get all marathons
+// Get all marathons registion
 app.get('/marathonsreg', async (req, res) => {
   const cursor = marathonsRegCollection.find();
   const result = await cursor.toArray();
