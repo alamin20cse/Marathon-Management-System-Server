@@ -115,7 +115,8 @@ app.delete('/marathons/:id',async(req,res)=>{
 })
 
 
-// ============
+// ========================================
+// =================================
 
 // for registeion of marathon part===============
 
@@ -132,11 +133,14 @@ app.delete('/marathons/:id',async(req,res)=>{
   }
   const updateRegCount=await marathonsCollection.updateOne(filter,update)
   console.log(updateRegCount)
-
-
-
   res.send(result);
 });
+
+
+
+
+
+
 
 // Get all marathons registion
 app.get('/marathonsreg', async (req, res) => {
@@ -146,6 +150,65 @@ app.get('/marathonsreg', async (req, res) => {
 });
   
   
+app.delete('/marathonsreg/:id', async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Ensure `id` is a valid ObjectId
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid ID format' });
+    }
+
+    // Find the registration to delete
+    const registration = await marathonsRegCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!registration) {
+      return res.status(404).send({ message: 'Registration not found' });
+    }
+
+    // Delete the registration
+    const deleteResult = await marathonsRegCollection.deleteOne({ _id: new ObjectId(id) });
+
+    if (deleteResult.deletedCount > 0) {
+      // Decrease the registration count in the marathons collection
+      const filter = { _id: new ObjectId(registration.marathonID) };
+      const update = {
+        $inc: { totalRegistrationCount: -1 }, // Decrease count by 1
+      };
+
+      const updateRegCount = await marathonsCollection.updateOne(filter, update);
+
+      if (updateRegCount.modifiedCount > 0) {
+        console.log('Registration count updated successfully');
+        res.send({ message: 'Registration deleted and count updated successfully' });
+      } else {
+        res.status(500).send({ message: 'Failed to update registration count' });
+      }
+    } else {
+      res.status(500).send({ message: 'Failed to delete registration' });
+    }
+  } catch (error) {
+    console.error('Error during delete operation:', error);
+    res.status(500).send({ message: 'An error occurred', error: error.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
