@@ -47,6 +47,45 @@ async function run() {
       res.send(result);
     });
 
+    // update
+    
+    app.put('/marathons/:id', async (req, res) => {
+
+      const id=req.params.id;
+      const filter={_id:new ObjectId(id)}
+      const options = { upsert: true };
+
+      updatedMarathon=req.body;
+      
+     marathon={
+
+        $set:{
+
+    
+           marathonTitle:updatedMarathon.marathonTitle,
+           startRegistrationDate:updatedMarathon.startRegistrationDate,
+           endRegistrationDate:updatedMarathon.endRegistrationDate,
+           marathonStartDate:updatedMarathon.marathonStartDate,
+           location:updatedMarathon.location,
+           runningDistance:updatedMarathon.runningDistance,
+           description:updatedMarathon.description,
+           marathonImage:updatedMarathon.marathonImage,
+           updatedAt:updatedMarathon.updatedAt,
+           email:updatedMarathon.email,
+
+
+          
+
+          
+        }
+      }
+      const result=await marathonsCollection.updateOne(filter,marathon,options);
+      res.send(result);
+
+
+    })
+
+
 
     // Backend API for marathon registration details
 app.get('/RegistrationMarathon/:id', async (req, res) => {
