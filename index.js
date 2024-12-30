@@ -40,6 +40,29 @@ async function run() {
       res.send(result);
     });
 
+      // Get all using limit marathons
+      app.get('/marathonslimit', async (req, res) => {
+        const cursor = marathonsCollection.find().limit(6);
+        const result = await cursor.toArray();
+        res.send(result);
+      });
+
+
+
+       // Get all using limit upcoming marathons
+       app.get('/marathonsupcoming', async (req, res) => {
+        
+        const cursor = marathonsCollection.find().sort({marathonStartDate:1});
+        const result = await cursor.toArray();
+        res.send(result);
+      });
+
+
+
+
+
+
+
     // Get a specific marathon by ID
     app.get('/marathons/:id', async (req, res) => {
       const id = req.params.id;
@@ -215,6 +238,7 @@ app.delete('/marathonsreg/:id', async (req, res) => {
       updatedReg=req.body;
       
      reg={
+
 
         $set:{
 
