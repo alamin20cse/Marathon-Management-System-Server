@@ -205,6 +205,47 @@ app.delete('/marathonsreg/:id', async (req, res) => {
     });
 
 
+    
+    app.put('/marathonsreg/:id', async (req, res) => {
+
+      const id=req.params.id;
+      const filter={_id:new ObjectId(id)}
+      const options = { upsert: true };
+
+      updatedReg=req.body;
+      
+     reg={
+
+        $set:{
+
+          
+           email:updatedReg.email,
+           marathonTitle:updatedReg.marathonTitle,
+           marathonStartDate:updatedReg.marathonStartDate,
+           firstName:updatedReg.firstName,
+           contactNumber:updatedReg.contactNumber,
+           additionalInfo:updatedReg.additionalInfo,
+           marathonID:updatedReg.marathonID,
+
+
+
+        
+
+          
+        }
+      }
+      const result=await marathonsRegCollection.updateOne(filter,reg,options);
+      res.send(result);
+
+
+    })
+
+    
+
+
+
+
+
 
 
 
