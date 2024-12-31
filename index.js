@@ -164,17 +164,26 @@ app.delete('/marathons/:id',async(req,res)=>{
 
 
 
-
-// Get all marathons registion
+// Get all marathons registration
 app.get('/marathonsreg', async (req, res) => {
-  const cursor = marathonsRegCollection.find();
+  const search = req.query.search; // Use req.query to access query parameters
+  // console.log(search); 
+
+  const query = search
+    ? { marathonTitle: { $regex: search, $options: 'i' } } // Case-insensitive search
+    : {};
+
+  const cursor = marathonsRegCollection.find(query);
   const result = await cursor.toArray();
   res.send(result);
 });
-  
+
+
+
   
 app.delete('/marathonsreg/:id', async (req, res) => {
   const id = req.params.id;
+
 
   try {
     // Ensure `id` is a valid ObjectId
