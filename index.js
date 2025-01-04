@@ -2,13 +2,26 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const jwt=require('jsonwebtoken')
 
 const app = express();
 const port = process.env.PORT || 5000;
+const corsOption = {
+  origin: [
+    'http://localhost:5173'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOption));
 app.use(express.json());
+
+
+
 
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.uslpn.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -25,6 +38,41 @@ async function run() {
     await client.connect();
     const marathonsCollection = client.db('marathonsDB').collection('marathons');
     const marathonsRegCollection = client.db('marathonsDB').collection('marathonReg');
+
+
+    // generate jwt
+    app.post('/jwt',async(req,res)=>{
+      const email=req.body;
+      // create token
+      const token= jwt.sign(email,process.env.SECRET_KEY,{expiresIn:'100d'})
+
+      console.log(token);
+      // res.send(token);
+      res.cookie('token',token,{
+        httpOnly:true,
+        secure:process.env.NODE_ENV==='production',
+        sameSite:process.env.NODE_ENV==='production'? 'none': 'strict'
+
+
+      }).send({success:true})
+    })
+
+
+    // logout cookie
+    // clear cookie
+    app.get('/logout',async(req,res)=>{
+      res.clearCookie('token',{
+       maxAge: 0,
+        secure:process.env.NODE_ENV==='production',
+        sameSite:process.env.NODE_ENV==='production'? 'none': 'strict'
+
+      }).send({success:true})
+    })
+
+
+
+
+
 
     // Create a new marathon
     app.post('/marathons', async (req, res) => {
