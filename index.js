@@ -33,12 +33,25 @@ async function run() {
       res.send(result);
     });
 
-    // Get all marathons
-    app.get('/marathons', async (req, res) => {
-      const cursor = marathonsCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
+
+
+   // Get all marathons
+app.get('/marathons', async (req, res) => {
+  const sort = req.query.sort;
+  let options = {};
+
+  if (sort === 'asc') {
+    options = { sort: { createdAt: 1 } }; // Ascending order
+  } else if (sort === 'desc') {
+    options = { sort: { createdAt: -1 } }; // Descending order
+  }
+
+  const cursor = marathonsCollection.find({}, options);
+  const result = await cursor.toArray();
+  res.send(result);
+});
+
+
 
       // Get all using limit marathons
       app.get('/marathonslimit', async (req, res) => {
