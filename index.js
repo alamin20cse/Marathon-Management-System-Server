@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const jwt=require('jsonwebtoken')
+const jwt=require('jsonwebtoken');
+const cookieParser=require('cookie-parser');
+const e = require('express');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -19,6 +21,7 @@ const corsOption = {
 // Middleware
 app.use(cors(corsOption));
 app.use(express.json());
+app.use(cookieParser())
 
 
 
@@ -33,20 +36,41 @@ const client = new MongoClient(uri, {
   },
 });
 
+
+const verifyToken= (req,res,next)=>{
+ const token=req.cookies?.token;
+ if(!token) return res.status(401).send({message:'unAuthorized access'})
+  jwt.verify(token,process.env.SECRET_KEY,(err,decoded)=>{
+if(err) {
+  return res.status(401).send({message:'unAuthorized access'})
+}
+
+req.user=decoded
+
+
+  })
+ 
+
+
+
+  next();
+
+}
+
+
 async function run() {
   try {
     await client.connect();
     const marathonsCollection = client.db('marathonsDB').collection('marathons');
     const marathonsRegCollection = client.db('marathonsDB').collection('marathonReg');
-
-
+  
     // generate jwt
     app.post('/jwt',async(req,res)=>{
       const email=req.body;
       // create token
       const token= jwt.sign(email,process.env.SECRET_KEY,{expiresIn:'100d'})
 
-      console.log(token);
+      // console.log(token);
       // res.send(token);
       res.cookie('token',token,{
         httpOnly:true,
@@ -82,22 +106,25 @@ async function run() {
     });
 
 
-
-   // Get all marathons
-app.get('/marathons', async (req, res) => {
-  const sort = req.query.sort;
-  let options = {};
-
-  if (sort === 'asc') {
-    options = { sort: { createdAt: 1 } }; // Ascending order
-  } else if (sort === 'desc') {
-    options = { sort: { createdAt: -1 } }; // Descending order
-  }
-
-  const cursor = marathonsCollection.find({}, options);
-  const result = await cursor.toArray();
-  res.send(result);
-});
+    app.get('/marathons',verifyToken, async (req, res) => {
+      try {
+        const sort = req.query.sort;
+        let sortOptions = {};
+    
+        if (sort === 'asc') {
+          sortOptions = { createdAt: 1 }; // Ascending order
+        } else if (sort === 'desc') {
+          sortOptions = { createdAt: -1 }; // Descending order
+        }
+    
+        const result = await marathonsCollection.find({}).sort(sortOptions).toArray();
+        res.send(result);
+      } catch (err) {
+        console.error('Error fetching marathons:', err.message);
+        res.status(500).send({ error: 'Internal Server Error' });
+      }
+    });
+    
 
 
 
@@ -204,6 +231,7 @@ app.delete('/marathons/:id',async(req,res)=>{
 
 // for registeion of marathon part===============
 
+
  // Create a new marathon regestion 
 //  1.save data in registion
  app.post('/marathonsreg', async (req, res) => {
@@ -225,8 +253,17 @@ app.delete('/marathons/:id',async(req,res)=>{
 
 
 
-// Get all marathons registration
-app.get('/marathonsreg', async (req, res) => {
+// Get all marathons registration My apply
+// =====Apply
+app.get('/marathonsreg',verifyToken, async (req, res) => {
+
+  const decodedEmail=req.user?.email;
+ 
+  // console.log('email fo token :',decodedEmail);
+  
+
+
+
   const search = req.query.search; // Use req.query to access query parameters
   // console.log(search); 
 
