@@ -40,7 +40,7 @@ Before running this project, ensure you have the following installed:
 
 1. Clone the repository:
    ```bash
-   git clone https:https:https://github.com/programming-hero-web-course2/b10a11-server-side-alamin20cse
+   git clone https://github.com/alamin20cse/Marathon-Management-System-Servere
 
 ## Live Link
 Check out the live application here: https://marathon-management-syst-7b404.web.app/
